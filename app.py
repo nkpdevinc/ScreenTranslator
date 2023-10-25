@@ -2,26 +2,14 @@ import pyautogui    # pip install pyautogui
 import keyboard     # pip install keyboard
 import pytesseract  # pip install pytesseract
 from PIL import Image, ImageGrab 
-
-'''
-def capture_and_read():
-    # Захват части экрана
-    screenshot = pyautogui.screenshot(region=(0, 0, 500, 500))
-    # Сохранение скриншота в файл
-    screenshot.save("E:\Python\Projects\Tests\ScreenTranslator\screenshot.png")
-    # Чтение текста со скриншота с помощью Tesseract OCR
-    text = pytesseract.image_to_string(Image.open("E:\Python\Projects\Tests\ScreenTranslator\screenshot.png"))
-    # Печать текста
-    print(text)
-
-# Привязка функции capture_and_read к клавише "9"
-keyboard.add_hotkey("9", capture_and_read)
-# Ожидание нажатия клавиши "9"
-keyboard.wait()
-'''
+import tkinter as tk
 
 from pynput import mouse # pip install pynput
 from PIL import ImageGrab
+
+import easyocr # pip install easyocr
+from translate import Translator # pip install translate
+
 
 # Создаем обработчик события нажатия кнопки мыши
 def on_click(x, y, button, pressed):
@@ -66,22 +54,40 @@ def capture_screen():
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
-        print('Справа на лево',x1, y1, x2, y2)
       
         screenshot = pyautogui.screenshot(region=(x1, y1, x2-x1, y2-y1))
         screenshot.save("E:\Python\Projects\Tests\ScreenTranslator\screenshot.png")
         
 
-    #text = pytesseract.image_to_string(screenshot)
-    # Выводим текст в терминал
-    #print(text)
+    path = 'E:\Python\Projects\Tests\ScreenTranslator\screenshot.png'
+    reader = easyocr.Reader(['en','ru'])   # Объект с распознаванием -  Языки которые будет искать на скрине (['ru','ch_sim','en']) 
+    result = reader.readtext(path, detail=0, paragraph=True)    # Если нет detail=0 то Выводит координаты текста, сам текст , точность распознавания
+
+    result_string = ''.join(result)
+    print("\nРезультат: ",result_string)
 
 
+    translator = Translator(to_lang="ru")
+    translation = translator.translate(result_string)
+
+    print('Перевод: ',translation)
 
 
-#keyboard.add_hotkey("9", capture_screen())
-# Ожидание нажатия клавиши "9"
-#keyboard.wait()
+    
+if __name__ == "__main__":
+    keyboard.add_hotkey("9", capture_screen)
+    # Ожидание нажатия клавиши "9"
+    keyboard.wait()
 
 
-capture_screen()
+'''
+    Hello world.
+
+    This is testing screen capture translator.
+
+    Whish me good luck!
+
+    Долбаные коммиты!!!!
+
+'''
+
